@@ -22,7 +22,10 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/inspection-report")
                 public class InspectionReportController {
-    
+
+
+
+/*
         @Resource
         private IInspectionReportService inspectionReportService;
 
@@ -53,6 +56,7 @@ import org.springframework.web.bind.annotation.RestController;
             queryWrapper.orderByDesc("id");
             return inspectionReportService.page(new Page<>(pageNum, pageSize));
         }
+*/
 
 }
 
