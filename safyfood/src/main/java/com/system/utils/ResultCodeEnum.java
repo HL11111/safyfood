@@ -8,6 +8,7 @@ public enum ResultCodeEnum {
 
     SUCCESS(200,"成功"),
     FAIL(201,"失败"),
+    DATA_DOES_NOT_EXIST(404,"数据不存在"),
     PARAM_ERROR(202,"参数不正常"),
     SERVICE_ERROR(203,"服务异常"),
     DATA_ERROR(204,"数据异常"),

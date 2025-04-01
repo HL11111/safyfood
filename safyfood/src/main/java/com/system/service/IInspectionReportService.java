@@ -2,6 +2,7 @@ package com.system.service;
 
 import com.system.pojo.InspectionReport;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.system.pojo.Vo.InspectionReportVo;
 
 /**
  * <p>
@@ -13,4 +14,11 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface IInspectionReportService extends IService<InspectionReport> {
 
+    boolean isExitReport(String reportId);
+
+    void updateStatus(String reportId);
+
+    boolean isExitReportByMerchant(int merchantIdStr);
+
+    void updateInspection(InspectionReportVo report);
 }

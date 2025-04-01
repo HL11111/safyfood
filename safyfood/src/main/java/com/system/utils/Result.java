@@ -5,6 +5,9 @@ package com.system.utils;
  * title 全局统一返回结果类
  */
 public class Result<T> {
+
+    //public static int DEFAULTERROR_CODE = 500;
+
     //返回码
     private Integer code;
 
@@ -56,6 +59,8 @@ public class Result<T> {
         this.setCode(code);
         return this;
     }
+
+
 
     public Integer getCode() {
         return code;

@@ -36,6 +36,21 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users> implements
     @Autowired
     private JwtHelper jwtHelper;
 
+
+
+    @Override
+    public boolean MerchantExists(Integer userId) {
+        //商家是否存在
+        //有数据 -> true
+        LambdaQueryWrapper<Users> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(Users::getUserId, userId);
+        queryWrapper.eq(Users::getIsDeleted, 0);
+        queryWrapper.eq(Users::getUserType,"商家");
+        Long count = usersMapper.selectCount(queryWrapper);
+
+        return count > 0;
+    }
+
     //用户登录接口
     @Override
     public Result login(Users user) {
