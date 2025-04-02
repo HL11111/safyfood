@@ -2,6 +2,8 @@ package com.system.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import java.util.List;
@@ -21,10 +23,11 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("/government")
+@Tag(name = "government信息管理")
                 public class GovernmentController {
-    
-        @Resource
-        private IGovernmentService governmentService;
+
+    @Resource
+    private IGovernmentService governmentService;
 
         @PostMapping
         public Boolean save(@RequestBody Government government) {
@@ -35,6 +38,7 @@ import org.springframework.web.bind.annotation.RestController;
         public Boolean delete(@PathVariable Integer id) {
             return governmentService.removeById(id);
         }
+
 
         @GetMapping
         public List<Government> findAll() {

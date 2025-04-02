@@ -25,5 +25,21 @@ public class Knife4jConfiguration {
                 build();
     }
 
+    @Bean
+    public GroupedOpenApi foodReportAPI() {
+        return GroupedOpenApi.builder().group("食品报告信息管理").
+                pathsToMatch("/footReport/**").
+                build();
+    }
+
+    @Bean
+    public GroupedOpenApi governmentAPI() {
+        return GroupedOpenApi.builder().group("政府标准信息管理").
+                pathsToMatch("/government-standard/**").
+                build();
+    }
+
+
+
 
 }

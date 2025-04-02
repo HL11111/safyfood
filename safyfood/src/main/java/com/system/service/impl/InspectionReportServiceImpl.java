@@ -26,10 +26,10 @@ public class InspectionReportServiceImpl extends ServiceImpl<InspectionReportMap
 
     @Override
     public boolean isExitReport(String reportId) {
-        //逻辑 当表中存在该报告id 并且 报告是通过的 -> count > 0
+        //逻辑 当表中存在该报告id 并且 报告是没有删除的 -> count > 0
         LambdaQueryWrapper<InspectionReport> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(InspectionReport::getReportId, reportId);
-        queryWrapper.eq(InspectionReport::getIsPassed,true);
+        queryWrapper.eq(InspectionReport::getIsDeleted,0);
         Long count = inspectionReportMapper.selectCount(queryWrapper);
         return count > 0;
     }

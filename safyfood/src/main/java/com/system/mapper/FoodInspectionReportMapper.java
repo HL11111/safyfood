@@ -1,6 +1,6 @@
 package com.system.mapper;
 
-import com.system.pojo.FootInspectionReport;
+import com.system.pojo.FoodInspectionReport;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
 /**
@@ -11,6 +11,6 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  * @author H
  * @since 2025-03-24
  */
-public interface FootInspectionReportMapper extends BaseMapper<FootInspectionReport> {
+public interface FoodInspectionReportMapper extends BaseMapper<FoodInspectionReport> {
 
 }

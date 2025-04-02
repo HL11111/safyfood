@@ -3,23 +3,27 @@ package com.system.controller;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.system.pojo.Users;
 import com.system.pojo.Vo.InspectionReportVo;
+import com.system.service.IFoodInspectionReportService;
 import com.system.service.IUsersService;
 import com.system.utils.Result;
 import com.system.utils.ResultCodeEnum;
+import com.tencentcloudapi.trp.v20210515.models.Merchant;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.catalina.User;
 import org.apache.commons.codec.binary.StringUtils;
 import org.hyperledger.fabric.client.Contract;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.util.*;
 
 import com.system.service.IInspectionReportService;
 import com.system.pojo.InspectionReport;
@@ -49,6 +53,9 @@ public class InspectionReportController {
     private IInspectionReportService inspectionReportService;
 
     @Autowired
+    private IFoodInspectionReportService foodInspectionReportService;
+
+    @Autowired
     private IUsersService usersService;
     @Autowired
     private Contract contract;
@@ -68,15 +75,17 @@ public class InspectionReportController {
             System.out.println("城市参数有效");
             String merchantId = String.valueOf(report.getUserId());
 
-            boolean b = usersService.MerchantExists(report.getUserId());
+            boolean b = usersService.isMerchantExists(report.getUserId());
             if (!b){
                 throw new RuntimeException("商家不存在");
             }
 
             boolean c = inspectionReportService.isExitReport(report.getReportId());
             if (c) {
+                System.out.println("判断报告是否存在"+c);
                 throw new RuntimeException("该商家报告已经存在，请勿重复提交");
             }
+            System.out.println("结果是" + c);
 
 /*
             // 调用 getSafetyStandardsJson() 方法将 safetyStandards 转换为 JSON 字符串
@@ -156,7 +165,7 @@ public class InspectionReportController {
             System.out.println("城市参数有效");
             String merchantId = String.valueOf(report.getUserId());
 
-            boolean b = usersService.MerchantExists(report.getUserId());
+            boolean b = usersService.isMerchantExists(report.getUserId());
             if (!b){
                 throw new RuntimeException("商家不存在");
             }
@@ -333,6 +342,113 @@ public class InspectionReportController {
             return Result.build(e.getMessage(),FAIL);
         }
     }
+
+    //新增数据 批准绿色认证
+    @Transactional
+    @PostMapping("/{city}/approveGreen")
+    @Operation(summary = "批准绿色认证")
+    public Result approveGreen(@PathVariable String city,@RequestParam int merchantId,@RequestParam String reportId,@RequestParam String foodId,@RequestParam boolean isApproved) throws Exception {
+
+        try{
+            if(!"SZ".equals(city) && !"GZ".equals(city)) {
+                throw new IllegalArgumentException("城市参数无效" + city);
+            }
+
+            boolean b = usersService.isMerchantExists(merchantId);
+            if (!b){
+                throw new RuntimeException("商家不存在");
+            }
+            if (foodId == null || foodId.isEmpty()) {
+                throw new RuntimeException("Food ID is empty");
+            }
+
+            boolean e = inspectionReportService.isExitReport(reportId);
+            boolean d = foodInspectionReportService.isExitFoodId(foodId);
+            if (!e) {
+                throw new RuntimeException("没有该商家的检测报告");
+            }
+            if (!d) {
+                throw new RuntimeException("没有该商家的食品报告");
+            }
+            if (usersService.isGetGreen(merchantId)){
+                System.out.println("检查绿色状态");
+                return Result.build("商家已认证", REPEAT_SUBMIT);
+
+            }
+
+            //创建一个新的交易提案，并指定要调用的合约方法名
+            contract.newProposal("approveGreenCertification")
+                    .addArguments(  //定义参数
+                            String.valueOf(merchantId),
+                            reportId,
+                            foodId,
+                            String.valueOf(isApproved)
+                    )
+                    .build()        //构建交易提案
+                    .endorse()      //认可（endorse）交易提案
+                    .submitAsync(); //异步调用
+            // 背书成功 -> 调用这个异步提交.submitAsync() -> 就会把背书的响应结果提交到order节点上 -> 进行排序 共识 出块
+
+            // 更新本地的绿色认证状态
+            Users merchant = usersService.getMerchant(merchantId);
+            if (isApproved) {
+                merchant.setIsGreenCertified(true);
+                merchant.setCertificationDate(LocalDate.now().toString()); // 设置认证日期
+                //merchant.setSafetyLevel("A"); // 设置安全等级
+                System.out.println("LocalDate.now()----------------------" + LocalDate.now());
+            } else {
+                merchant.setIsGreenCertified(false);
+                merchant.setCertificationDate(""); // 清空认证日期
+                //merchant.setSafetyLevel(""); // 清空安全等级
+            }
+            usersService.updateUser(merchant);
+
+
+            return Result.ok(reportId);
+        }catch (Exception e){
+            log.error("批准失败:{}", e.getMessage());
+            return Result.build(e.getMessage(),FAIL);
+        }
+    }
+
+
+    //修改绿色认证状态
+    @Operation(summary = "修改绿色认证状态")
+    @PostMapping("/updateApproveGreen/{merchantId}")
+    public Result updateApproveGreen(@PathVariable String merchantId,@RequestParam String status) {
+        LambdaUpdateWrapper<Users> updateWrapper = new LambdaUpdateWrapper<>();
+        updateWrapper.eq(Users::getUserId, merchantId);
+        updateWrapper.set(Users::getCertificationDate,status);
+        usersService.update(updateWrapper);
+        return Result.ok(merchantId);
+    }
+
+
+
+
+    //证书是否过期
+    private boolean isCertificateExpired(String inspectionDate, int validityPeriod) {
+        try {
+            // 解析检测日期
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+            Date inspectionDateObj = sdf.parse(inspectionDate);
+
+            // 计算有效期截止日期
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(inspectionDateObj);
+            calendar.add(Calendar.MONTH, validityPeriod);
+            Date expirationDate = calendar.getTime();
+
+            // 获取当前日期
+            Date currentDate = new Date();
+
+            // 判断是否过期
+            return currentDate.after(expirationDate);
+        } catch (Exception e) {
+            throw new RuntimeException("Error parsing inspection date: " + e.getMessage());
+        }
+    }
+
 
 
 /*
