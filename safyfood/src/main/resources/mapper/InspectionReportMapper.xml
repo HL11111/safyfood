@@ -2,4 +2,8 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.system.mapper.InspectionReportMapper">
 
+    <select id="selectByReportId" resultType="com.system.pojo.InspectionReport">
+        SELECT * FROM inspection_report
+        where report_id = #{reportId};
+    </select>
 </mapper>

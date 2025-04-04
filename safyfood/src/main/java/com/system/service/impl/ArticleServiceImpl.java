@@ -134,6 +134,39 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         if (requestMap.containsKey("cityOrigin")) {
             article.setCityOrigin(String.valueOf(requestMap.get("cityOrigin")));
         }
+        if (requestMap.containsKey("likeCount")) {
+            article.setLikeCount(Integer.parseInt(String.valueOf(requestMap.get("likeCount"))));
+        }
+        if (requestMap.containsKey("dislikeCount")) {
+            article.setDislikeCount(Integer.parseInt(String.valueOf(requestMap.get("dislikeCount"))));
+        }
+        if (requestMap.containsKey("commentCount")) {
+            article.setCommentCount(Integer.parseInt(String.valueOf(requestMap.get("commentCount"))));
+        }
+        if (requestMap.containsKey("aduitBy")) {
+            article.setAduitBy(String.valueOf(requestMap.get("aduitBy")));
+        }
+        if (requestMap.containsKey("articleStatus")) {
+            article.setArticleStatus(String.valueOf(requestMap.get("articleStatus")));
+        }
+        if (requestMap.containsKey("aduitTime")) {
+            article.setAduitTime(LocalDateTime.parse(String.valueOf(requestMap.get("aduitTime"))));
+        }
+        if (requestMap.containsKey("illegalQuestion")) {
+            article.setIllegalQuestion(String.valueOf(requestMap.get("illegalQuestion")));
+        }
+        if (requestMap.containsKey("favoriteStatus")) {
+            article.setFavoriteStatus(String.valueOf(requestMap.get("favoriteStatus")));
+        }
+        if (requestMap.containsKey("isDeleted")) {
+            article.setIsDeleted(Integer.parseInt(String.valueOf(requestMap.get("isDeleted"))));
+        }
+        if (requestMap.containsKey("userId")) {
+            article.setUserId(Integer.parseInt(String.valueOf(requestMap.get("userId"))));
+        }
+        if (requestMap.containsKey("publishTime")) {
+            article.setPublishTime(LocalDateTime.parse(String.valueOf(requestMap.get("publishTime"))));
+        }
     }
 
     //分页查询文章信息接口 (查询条件为is_deleted = 0)

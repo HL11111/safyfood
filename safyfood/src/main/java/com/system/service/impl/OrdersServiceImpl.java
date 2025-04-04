@@ -133,8 +133,20 @@ public class OrdersServiceImpl extends ServiceImpl<OrdersMapper, Orders> impleme
         if (requestMap.containsKey("orderPhone")) {
             order.setOrderPhone(String.valueOf(requestMap.get("orderPhone")));
         }
+        if (requestMap.containsKey("createTime")) {
+            order.setCreateTime(LocalDateTime.parse(String.valueOf(requestMap.get("createTime"))));
+        }
+        if (requestMap.containsKey("updateTime")) {
+            order.setUpdateTime(LocalDateTime.parse(String.valueOf(requestMap.get("updateTime"))));
+        }
         if (requestMap.containsKey("expectTime")) {
             order.setExpectTime(LocalDateTime.parse(String.valueOf(requestMap.get("expectTime"))));
+        }
+        if (requestMap.containsKey("finishTime")) {
+            order.setFinishTime(LocalDateTime.parse(String.valueOf(requestMap.get("finishTime"))));
+        }
+        if (requestMap.containsKey("isDeleted")) {
+            order.setIsDeleted(Integer.parseInt(String.valueOf(requestMap.get("isDeleted"))));
         }
     }
 

@@ -13,8 +13,6 @@ spring:
       username: root
       password: 752666
       driver-class-name: com.mysql.cj.jdbc.Driver
-  application:
-    name: foot_safety_Chaincode_JavaClient
 
 # mybatis-plus的配置
 mybatis-plus:
@@ -33,18 +31,3 @@ jwt:
   token:
     tokenExpiration: 120 #有效时间,单位分钟
     tokenSignKey: training_system123456  #当前程序签名秘钥 自定义
-
-
-#--------------------------------------------------------------
-
-fabric:
-  mspId: Org1MSP
-  channel: businesschannel
-  certificatePath: src/main/resources/crypto-config/peerOrganizations/org1.example.com/users/User1@org1.example.com/msp/signcerts/User1@org1.example.com-cert.pem
-  privateKeyPath: src/main/resources/crypto-config/peerOrganizations/org1.example.com/users/User1@org1.example.com/msp/keystore/priv_sk
-  tlsCertPath: src/main/resources/crypto-config/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt
-
-logging:
-  level:
-    org:
-      hyperledger: trace

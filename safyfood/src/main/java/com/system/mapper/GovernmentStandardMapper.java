@@ -12,5 +12,5 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  * @since 2025-03-24
  */
 public interface GovernmentStandardMapper extends BaseMapper<GovernmentStandard> {
-
+    GovernmentStandard selectStandardById(String standardId);
 }

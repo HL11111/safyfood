@@ -128,11 +128,20 @@ public class ServiceInfoServiceImpl extends ServiceImpl<ServiceInfoMapper, Servi
         if (requestMap.containsKey("servicePhone")) {
             serviceInfo.setServicePhone(String.valueOf(requestMap.get("servicePhone")));
         }
+        if (requestMap.containsKey("createTime")) {
+            serviceInfo.setCreateTime(LocalDateTime.parse(String.valueOf(requestMap.get("createTime"))));
+        }
+        if (requestMap.containsKey("updateTime")) {
+            serviceInfo.setUpdateTime(LocalDateTime.parse(String.valueOf(requestMap.get("updateTime"))));
+        }
         if (requestMap.containsKey("articleId")) {
             serviceInfo.setArticleId(Integer.parseInt(String.valueOf(requestMap.get("articleId"))));
         }
         if (requestMap.containsKey("foodId")) {
             serviceInfo.setFoodId(String.valueOf(requestMap.get("foodId")));
+        }
+        if (requestMap.containsKey("isDeleted")) {
+            serviceInfo.setIsDeleted(Integer.parseInt(String.valueOf(requestMap.get("isDeleted"))));
         }
     }
 

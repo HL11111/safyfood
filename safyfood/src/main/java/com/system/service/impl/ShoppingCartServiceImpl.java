@@ -138,6 +138,12 @@ public class ShoppingCartServiceImpl extends ServiceImpl<ShoppingCartMapper, Sho
         if (requestMap.containsKey("shoppingStatus")) {
             cart.setShoppingStatus(String.valueOf(requestMap.get("shoppingStatus")));
         }
+        if (requestMap.containsKey("createTime")) {
+            cart.setCreateTime(LocalDateTime.parse(String.valueOf(requestMap.get("createTime"))));
+        }
+        if (requestMap.containsKey("isDeleted")) {
+            cart.setIsDeleted(Integer.parseInt(String.valueOf(requestMap.get("isDeleted"))));
+        }
     }
 
     //分页查询购物车信息接口 (查询条件为is_deleted = 0)
