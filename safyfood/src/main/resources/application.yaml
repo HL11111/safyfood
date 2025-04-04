@@ -4,17 +4,34 @@ server:
   servlet:
     context-path: /
 
+#--------------------------------------------------------------
+
+fabric:
+  mspId: Org1MSP
+  channel: businesschannel
+  certificatePath: D:/Mine/Blockchain/Z/1orderer1org2peer/Chaincode/new/safyfood/safyfood/src/main/resources/crypto-config/peerOrganizations/org1.example.com/users/User1@org1.example.com/msp/signcerts/User1@org1.example.com-cert.pem
+  privateKeyPath: D:/Mine/Blockchain/Z/1orderer1org2peer/Chaincode/new/safyfood/safyfood/src/main/resources/crypto-config/peerOrganizations/org1.example.com/users/User1@org1.example.com/msp/keystore/priv_sk
+  tlsCertPath: D:/Mine/Blockchain/Z/1orderer1org2peer/Chaincode/new/safyfood/safyfood/src/main/resources/crypto-config/peerOrganizations/org1.example.com/users/User1@org1.example.com/tls/ca.crt
+
+logging:
+  level:
+    org:
+      hyperledger: trace
 # 连接池配置
+
 spring:
   datasource:
     type: com.alibaba.druid.pool.DruidDataSource
     druid:
       url: jdbc:mysql:///safyfooddb
       username: root
-      password: 752666
+      password: 123456
       driver-class-name: com.mysql.cj.jdbc.Driver
-
+  application:
+    name: foot_safety_Chaincode_JavaClient
 # mybatis-plus的配置
+
+
 mybatis-plus:
   type-aliases-package: com.system.pojo
   global-config:
@@ -24,9 +41,9 @@ mybatis-plus:
 #      table-prefix: news_ # 设置表的前缀
   configuration:
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
-
-
 #jwt配置
+
+
 jwt:
   token:
     tokenExpiration: 120 #有效时间,单位分钟

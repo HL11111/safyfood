@@ -1,6 +1,7 @@
 package com.system.pojo;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import java.io.Serializable;
 import java.sql.Blob;
@@ -9,6 +10,7 @@ import java.time.LocalDateTime;
 import io.swagger.annotations.ApiModel;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.ibatis.type.JdbcType;
 
 /**
  * <p>
@@ -76,9 +78,10 @@ public class Users implements Serializable {
 
     private Blob greenIcon;
 
+    @TableField(value = "is_green_certified", jdbcType = JdbcType.INTEGER)
     private Boolean isGreenCertified;
 
-    private LocalDate certificationDate;
+    private String certificationDate;
 
     private Integer adminLevel;
 

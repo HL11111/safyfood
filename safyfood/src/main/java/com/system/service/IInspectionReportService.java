@@ -2,9 +2,7 @@ package com.system.service;
 
 import com.system.pojo.InspectionReport;
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.system.utils.Result;
-
-import java.util.Map;
+import com.system.pojo.Vo.InspectionReportVo;
 
 /**
  * <p>
@@ -15,9 +13,12 @@ import java.util.Map;
  * @since 2025-03-24
  */
 public interface IInspectionReportService extends IService<InspectionReport> {
-    Result manageReport(Map<String, Object> requestMap);  //需要管理员身份
 
-    Result findAll(Integer pageNum, Integer pageSize, Integer userId);  //无需管理员身份
+    boolean isExitReport(String reportId);
 
-    Result findOne(InspectionReport report);  //无需管理员身份
+    void updateStatus(String reportId);
+
+    boolean isExitReportByMerchant(int merchantIdStr);
+
+    void updateInspection(InspectionReportVo report);
 }

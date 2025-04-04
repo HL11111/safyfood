@@ -36,6 +36,21 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users> implements
     @Autowired
     private JwtHelper jwtHelper;
 
+
+
+    @Override
+    public boolean isMerchantExists(Integer userId) {
+        //商家是否存在
+        //有数据 -> true
+        LambdaQueryWrapper<Users> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(Users::getUserId, userId);
+        queryWrapper.eq(Users::getIsDeleted, 0);
+        queryWrapper.eq(Users::getUserType,"商家");
+        Long count = usersMapper.selectCount(queryWrapper);
+
+        return count > 0;
+    }
+
     //用户登录接口
     @Override
     public Result login(Users user) {
@@ -446,6 +461,38 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users> implements
         } catch (Exception e) {
             return Result.build(null, ResultCodeEnum.SERVICE_ERROR);
         }
+    }
+
+    @Override
+    public Users getMerchant(int merchantId) {
+        LambdaQueryWrapper<Users> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(Users::getUserId, merchantId);
+        wrapper.eq(Users::getIsDeleted, 0);
+        wrapper.eq(Users::getUserType,"商家");
+        if (usersMapper.selectCount(wrapper) == 0) {
+            throw new RuntimeException("商家不存在");
+        }
+        return usersMapper.selectById(merchantId);
+
+    }
+
+    @Override
+    public void updateUser(Users merchant) {
+        usersMapper.updateById(merchant);
+    }
+
+    @Override
+    public void updateMerchant(Users merchant) {
+        usersMapper.updateById(merchant);
+    }
+
+    @Override
+    public boolean isGetGreen(int merchantId) {
+        LambdaQueryWrapper<Users> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(Users::getUserId, merchantId);
+        wrapper.eq(Users::getIsDeleted, 0);
+        wrapper.eq(Users::getIsGreenCertified,true);
+        return usersMapper.selectCount(wrapper) > 0;
     }
 
     //

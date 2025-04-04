@@ -18,6 +18,9 @@ import java.util.Map;
  */
 public interface IUsersService extends IService<Users> {
 
+    boolean isMerchantExists(Integer userId);
+
+    /* ========================================= */
     Result login(Users user);
 
     Result regist(Users user);
@@ -33,4 +36,14 @@ public interface IUsersService extends IService<Users> {
 
     //用户和商家修改自身信息
     Result updateSelfInfo(Map<String, Object> requestMap);
+
+    Users getMerchant(int merchantId);
+
+    void updateUser(Users merchant);
+
+    void updateMerchant(Users merchant);
+
+    boolean isGetGreen(int merchantId);
 }
+
+
