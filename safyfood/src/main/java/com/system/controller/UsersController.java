@@ -1,15 +1,11 @@
 package com.system.controller;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.system.utils.Result;
-import io.jsonwebtoken.lang.Classes;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import javax.annotation.Resource;
-import java.util.List;
+
 import java.util.Map;
 
 import com.system.service.IUsersService;
@@ -25,11 +21,19 @@ import org.springframework.web.bind.annotation.RestController;
  * @author H
  * @since 2025-03-24
  */
+@Tag(name = "用户管理")
 @RestController
 @RequestMapping("/users")
 public class UsersController {
     @Autowired
     private IUsersService usersService;
+
+    @GetMapping("login/getCode")
+    @Operation(summary = "获取短信验证码")
+    public Result getCode(@RequestParam String phone) {
+        usersService.getCode(phone);
+        return Result.ok(null);
+    }
 
     @Operation(summary ="根据用户信息获取登录响应")
     @PostMapping("/login")
@@ -40,8 +44,8 @@ public class UsersController {
 
     @Operation(summary = "根据用户信息注册")
     @PostMapping("/regist")
-    public Result regist(@RequestBody Users user) {
-        return usersService.regist(user);
+    public Result regist(@RequestBody Users user,@RequestParam String code) {
+        return usersService.regist(user,code);
     }
 
     @Operation(summary = "根据用户Id删除用户")

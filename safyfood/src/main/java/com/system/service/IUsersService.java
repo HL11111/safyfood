@@ -1,7 +1,6 @@
 package com.system.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.system.pojo.Users;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.system.utils.Result;
@@ -23,7 +22,7 @@ public interface IUsersService extends IService<Users> {
     /* ========================================= */
     Result login(Users user);
 
-    Result regist(Users user);
+    Result regist(Users user,String code);
 
     Result delete(Users user);
 
@@ -44,6 +43,8 @@ public interface IUsersService extends IService<Users> {
     void updateMerchant(Users merchant);
 
     boolean isGetGreen(int merchantId);
+
+    void getCode(String phone);
 }
 
 

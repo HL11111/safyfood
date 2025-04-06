@@ -30,6 +30,12 @@ spring:
   application:
     name: foot_safety_Chaincode_JavaClient
 # mybatis-plus的配置
+  #配置Redis连接参数 /这里需要配合虚拟机的redis服务。存放验证码信息
+  data:
+    redis:
+      host: 192.168.10.101
+      port: 6379
+      database: 0
 
 
 mybatis-plus:
@@ -48,3 +54,10 @@ jwt:
   token:
     tokenExpiration: 120 #有效时间,单位分钟
     tokenSignKey: training_system123456  #当前程序签名秘钥 自定义
+
+aliyun:
+  sms:
+    access-key-id: LTAI5tNkSSJ7QRvpX2RtWDDF
+    access-key-secret: 5OccOCTSSs4RRgBZ8cDLVL9XPAZ4Rj
+    endpoint: dysmsapi.aliyuncs.com
+

@@ -1,24 +1,28 @@
 package com.system.service.impl;
 
 import com.alibaba.druid.util.StringUtils;
+import com.aliyun.dysmsapi20170525.models.SendSmsRequest;
+import com.aliyun.teaopenapi.Client;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.system.constant.RedisConstant;
+import com.system.exception.LeaseException;
 import com.system.pojo.Users;
 import com.system.mapper.UsersMapper;
 import com.system.service.IUsersService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.system.service.SmsService;
 import com.system.utils.*;
-import io.jsonwebtoken.lang.Classes;
-import net.sf.jsqlparser.expression.DateTimeLiteralExpression;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.lang.reflect.Field;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 /**
  * <p>
@@ -35,6 +39,14 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users> implements
 
     @Autowired
     private JwtHelper jwtHelper;
+    @Autowired
+    private Client client;
+
+    @Autowired
+    private SmsService smsService;
+
+    @Autowired
+    private StringRedisTemplate redisTemplate;
 
 
 
@@ -99,7 +111,7 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users> implements
     // 将验证码缓存定义为类的静态成员变量
 //    private static final Map<String, String> verificationCodeCache = new HashMap<>();
     @Override
-    public Result regist(Users user) {
+    public Result regist(Users user,String phoneCode) {
         // 新增：获取用户手机号，假设Users实体类中有getPhone方法获取手机号
 //        String phoneNumber = user.getPhone();
 //        // 新增：发送短信验证码并获取验证码内容
@@ -108,6 +120,29 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users> implements
 //            return Result.build(null, ResultCodeEnum.SMS_SEND_ERROR); // 假设ResultCodeEnum中新增了短信发送失败的枚举项
 //        }
 //        verificationCodeCache.put(phoneNumber, verificationCode);
+
+
+        //判断手机号和验证码是否为空
+        if (user.getPhone() == null) {
+            throw new LeaseException(ResultCodeEnum.APP_LOGIN_PHONE_EMPTY);
+        }
+        if (phoneCode == null) {
+            throw new LeaseException(ResultCodeEnum.APP_LOGIN_CODE_EMPTY);
+        }
+
+        //校验验证码
+        String key = RedisConstant.APP_LOGIN_PREFIX + user.getPhone();
+        String code = redisTemplate.opsForValue().get(key);
+        if (code == null) {
+            throw new LeaseException(ResultCodeEnum.APP_LOGIN_CODE_EXPIRED);
+            //验证码已过期
+        }
+        if (!code.equals(phoneCode)) {
+            //验证码不相等
+            throw new LeaseException(ResultCodeEnum.APP_LOGIN_CODE_ERROR);
+        }
+
+
 
         Long count = usersMapper.selectCountByUserName(user.getUserName());
 //        System.out.println(count);
@@ -494,6 +529,43 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users> implements
         wrapper.eq(Users::getIsGreenCertified,true);
         return usersMapper.selectCount(wrapper) > 0;
     }
+
+
+    @Override
+    public void getCode(String phone) {
+        /*
+         * 逻辑：
+         *   1.随机生成验证码
+         *   2.短信形式发送验证码
+         *   3.手机号码为key 验证码为value 保存到redis
+         *   4.时效性设置TTL
+         *   5.显示发送频率
+         * */
+        String code = CodeUtil.getRandomCode(6);
+
+        // 指的是剩下的时间
+        String key = RedisConstant.APP_LOGIN_PREFIX + phone;
+
+        Boolean hasKey = redisTemplate.hasKey(key);
+        if (hasKey) {
+            //存在 -> 获取
+            //getExpire用来获取key的TTL，可以指定返回值的单位
+            Long ttl = redisTemplate.getExpire(key, TimeUnit.SECONDS);
+            //计算时间
+            if (RedisConstant.APP_LOGIN_CODE_TTL_SEC -ttl < RedisConstant.APP_LOGIN_CODE_RESEND_TIME_SEC  ){
+                //若存在时间不足一分钟，响应发送过于频繁
+                throw new LeaseException(ResultCodeEnum.APP_SEND_SMS_TOO_OFTEN);
+            }
+        }
+
+        smsService.sendCode(phone, code);
+        redisTemplate.opsForValue().set(key, code,RedisConstant.APP_LOGIN_CODE_TTL_SEC, TimeUnit.SECONDS);
+        //时效 -》 10分钟
+        //限制频率 -》 每分钟1条
+
+
+    }
+
 
     //
 

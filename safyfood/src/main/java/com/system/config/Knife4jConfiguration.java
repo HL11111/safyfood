@@ -33,11 +33,26 @@ public class Knife4jConfiguration {
     }
 
     @Bean
-    public GroupedOpenApi governmentAPI() {
+    public GroupedOpenApi governmentStandardAPI() {
         return GroupedOpenApi.builder().group("政府标准信息管理").
                 pathsToMatch("/government-standard/**").
                 build();
     }
+
+    @Bean
+    public GroupedOpenApi governmentAPI() {
+        return GroupedOpenApi.builder().group("政府信息管理").
+                pathsToMatch("/government/**").
+                build();
+    }
+    @Bean
+    public GroupedOpenApi phoneCodeAPI() {
+        return GroupedOpenApi.builder().group("验证码信息管理").
+                pathsToMatch("/users/**").
+                build();
+    }
+
+
 
 
 

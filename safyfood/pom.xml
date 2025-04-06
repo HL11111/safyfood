@@ -258,9 +258,18 @@
         </dependency>
 
 
+        <!-- 验证码 -->
+    <dependency>
+        <groupId>com.aliyun</groupId>
+        <artifactId>dysmsapi20170525</artifactId>
+        <version>3.1.2</version>
+    </dependency>
 
-
-
+        <!-- Redis -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-redis</artifactId>
+        </dependency>
 
     </dependencies>
     <!--设置是springboot版本-->
