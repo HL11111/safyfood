@@ -144,6 +144,9 @@ public class FoodInfoServiceImpl extends ServiceImpl<FoodInfoMapper, FoodInfo> i
         if (requestMap.containsKey("foodIngredient")) {
             foodInfo.setFoodIngredient(String.valueOf(requestMap.get("foodIngredient")));
         }
+        if (requestMap.containsKey("monthSell")) {
+            foodInfo.setMonthSell(Integer.parseInt(String.valueOf(requestMap.get("monthSell"))));
+        }
         if (requestMap.containsKey("foodStore")) {
             foodInfo.setFoodStore(Integer.parseInt(String.valueOf(requestMap.get("foodStore"))));
         }
@@ -152,6 +155,21 @@ public class FoodInfoServiceImpl extends ServiceImpl<FoodInfoMapper, FoodInfo> i
         }
         if (requestMap.containsKey("foodOrigin")) {
             foodInfo.setFoodOrigin(String.valueOf(requestMap.get("foodOrigin")));
+        }
+        if (requestMap.containsKey("favoriteStatus")) {
+            foodInfo.setFavoriteStatus(Integer.parseInt(String.valueOf(requestMap.get("favoriteStatus"))));
+        }
+        if (requestMap.containsKey("createTime")) {
+            foodInfo.setCreateTime(LocalDateTime.parse(String.valueOf(requestMap.get("createTime"))));
+        }
+        if (requestMap.containsKey("updateTime")) {
+            foodInfo.setUpdateTime(LocalDateTime.parse(String.valueOf(requestMap.get("updateTime"))));
+        }
+        if (requestMap.containsKey("rankType")) {
+            foodInfo.setRankType(Integer.parseInt(String.valueOf(requestMap.get("rankType"))));
+        }
+        if (requestMap.containsKey("isDeleted")) {
+            foodInfo.setIsDeleted(Integer.parseInt(String.valueOf(requestMap.get("isDeleted"))));
         }
     }
 

@@ -2,4 +2,8 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.system.mapper.GovernmentMapper">
 
+    <select id="selectGovernmentById" resultType="com.system.pojo.Government">
+        select * from government
+        WHERE government_id = #{governmentId};
+    </select>
 </mapper>

@@ -12,5 +12,5 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  * @since 2025-03-24
  */
 public interface InspectionReportMapper extends BaseMapper<InspectionReport> {
-
+    InspectionReport selectByReportId (String reportId);
 }

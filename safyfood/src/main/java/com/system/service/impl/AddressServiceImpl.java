@@ -136,6 +136,15 @@ public class AddressServiceImpl extends ServiceImpl<AddressMapper, Address> impl
         if (requestMap.containsKey("contactPhone")) {
             address.setContactPhone(String.valueOf(requestMap.get("contactPhone")));
         }
+        if (requestMap.containsKey("createTime")) {
+            address.setCreateTime(LocalDateTime.parse(String.valueOf(requestMap.get("createTime"))));
+        }
+        if (requestMap.containsKey("updateTime")) {
+            address.setUpdateTime(LocalDateTime.parse(String.valueOf(requestMap.get("updateTime"))));
+        }
+        if (requestMap.containsKey("isDeleted")) {
+            address.setIsDeleted(Integer.parseInt(String.valueOf(requestMap.get("isDeleted"))));
+        }
     }
 
 
