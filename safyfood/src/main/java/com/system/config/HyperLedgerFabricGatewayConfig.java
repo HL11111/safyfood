@@ -3,13 +3,13 @@ package com.system.config;
 import io.grpc.ManagedChannel;
 import io.grpc.netty.shaded.io.grpc.netty.GrpcSslContexts;
 import io.grpc.netty.shaded.io.grpc.netty.NettyChannelBuilder;
+import jakarta.annotation.PostConstruct;
+import lombok.extern.slf4j.Slf4j;
 import org.hyperledger.fabric.client.CallOption;
 import org.hyperledger.fabric.client.Contract;
 import org.hyperledger.fabric.client.Gateway;
 import org.hyperledger.fabric.client.Network;
-import org.hyperledger.fabric.client.identity.Identities;
-import org.hyperledger.fabric.client.identity.Signers;
-import org.hyperledger.fabric.client.identity.X509Identity;
+import org.hyperledger.fabric.client.identity.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -18,9 +18,12 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.security.InvalidKeyException;
 import java.security.PrivateKey;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
 
@@ -30,6 +33,92 @@ import java.util.concurrent.TimeUnit;
  * 配置类
  */
 
+@Slf4j
+@Configuration
+public class HyperLedgerFabricGatewayConfig {
+
+    @Autowired
+    private HyperLedgerFabricProperties fabricProperties;
+
+    // 存储所有Peer通道的Map
+    private final Map<String, ManagedChannel> peerChannels = new ConcurrentHashMap<>();
+    private ManagedChannel defaultChannel;
+
+    @PostConstruct
+    public void init() throws Exception {
+        // 初始化默认Peer (peer0)
+        defaultChannel = createChannel("peer0.org1.example.com", "192.168.10.106:7051");
+        peerChannels.put("default", defaultChannel);
+
+        // 初始化SZ Peer (peer0)
+        ManagedChannel szChannel = createChannel("peer0.org1.example.com", "192.168.10.106:7051");
+        peerChannels.put("SZ", szChannel);
+
+        // 初始化GZ Peer (peer1)
+        ManagedChannel gzChannel = createChannel("peer1.org1.example.com", "192.168.10.106:8051");
+        peerChannels.put("GZ", gzChannel);
+    }
+
+    // 创建gRPC通道的通用方法
+    private ManagedChannel createChannel(String overrideAuthority, String target)
+            throws IOException, CertificateException {
+        Reader tlsCertReader = Files.newBufferedReader(Paths.get(fabricProperties.getTlsCertPath()));
+        X509Certificate tlsCert = Identities.readX509Certificate(tlsCertReader);
+
+        return NettyChannelBuilder.forTarget(target)
+                .sslContext(GrpcSslContexts.forClient().trustManager(tlsCert).build())
+                .overrideAuthority(overrideAuthority)
+                .build();
+    }
+
+    // 根据城市获取Contract
+    public Contract getContractForCity(String city) {
+        ManagedChannel channel = peerChannels.getOrDefault(city.toUpperCase(), defaultChannel);
+        return createContract(channel);
+    }
+
+    // 获取默认Contract
+    public Contract getDefaultContract() {
+        return createContract(defaultChannel);
+    }
+
+    // 创建Contract的通用方法
+    private Contract createContract(ManagedChannel channel) {
+        try {
+            return Gateway.newInstance()
+                    .identity(loadIdentity())
+                    .signer(loadSigner())
+                    .connection(channel)
+                    .connect()
+                    .getNetwork(fabricProperties.getChannel())
+                    .getContract("food-safety-contract", "FootSafetyContract");
+        } catch (Exception e) {
+            throw new RuntimeException("无法创建Contract: " + e.getMessage());
+        }
+    }
+
+
+    private Identity loadIdentity() throws IOException, CertificateException {
+        try (Reader reader = Files.newBufferedReader(Paths.get(fabricProperties.getCertificatePath()))) {
+            X509Certificate cert = Identities.readX509Certificate(reader);
+            return new X509Identity(fabricProperties.getMspId(), cert);
+        }
+    }
+
+    private Signer loadSigner() throws IOException {
+        try (Reader reader = Files.newBufferedReader(Paths.get(fabricProperties.getPrivateKeyPath()))) {
+            PrivateKey privateKey = Identities.readPrivateKey(reader);
+            return Signers.newPrivateKeySigner(privateKey);
+        } catch (InvalidKeyException e) {
+            throw new RuntimeException(e);
+        }
+    }
+}
+
+
+
+//静态选择peer节点
+/*
 @Configuration
 public class HyperLedgerFabricGatewayConfig {
 
@@ -106,3 +195,4 @@ public class HyperLedgerFabricGatewayConfig {
 
 
 }
+*/

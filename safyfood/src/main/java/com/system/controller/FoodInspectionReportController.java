@@ -1,5 +1,6 @@
 package com.system.controller;
 
+import com.system.config.HyperLedgerFabricGatewayConfig;
 import com.system.pojo.FoodInspectionReport;
 import com.system.service.IUsersService;
 import com.system.utils.Result;
@@ -34,8 +35,14 @@ public class FoodInspectionReportController {
 
     @Autowired
     private IFoodInspectionReportService reportService;
+
+    //动态选择peer节点
     @Autowired
-    private Contract contract;
+    private HyperLedgerFabricGatewayConfig gatewayConfig;
+
+
+    /*    @Autowired
+    private Contract contract;*/
 
     @Autowired
     private IUsersService usersService;
@@ -60,6 +67,8 @@ public class FoodInspectionReportController {
                 throw new RuntimeException("该食品报告已经存在，请勿重复提交");
             }
 
+            // 根据city获取对应的Contract
+            Contract contract = gatewayConfig.getContractForCity(city);
 
             log.info("开始提交食品检测报告，foodId: {}", report.getFoodId());
             log.info("调用链码，参数: foodId={}, merchantId={}, inspectionDate={}, inspectionAgency={}, safetyLevel={}, isPassed={}, complaintId={}",
@@ -120,6 +129,10 @@ public class FoodInspectionReportController {
             if (!b){
                 throw new RuntimeException("商家不存在");
             }
+
+            // 根据city获取对应的Contract
+            Contract contract = gatewayConfig.getContractForCity(city);
+
 
             log.info("开始修改食品检测报告，foodId: {}", report.getFoodId());
             log.info("调用链码，参数: foodId={}, merchantId={}, inspectionDate={}, inspectionAgency={}, safetyLevel={}, isPassed={}, complaintId={}",
@@ -204,6 +217,9 @@ public class FoodInspectionReportController {
                 throw new RuntimeException("商家不存在");
             }
 
+            // 使用默认Contract
+            Contract contract = gatewayConfig.getDefaultContract();
+
             //调用链码方法
             byte[] reportByte = contract.evaluateTransaction("queryFoodReports", String.valueOf(merchantId));
             String reportJson = StringUtils.newStringUtf8(reportByte);
@@ -233,6 +249,9 @@ public class FoodInspectionReportController {
             if (!b){
                 throw new RuntimeException("没有该数据信息的索引");
             }
+
+            // 使用默认Contract
+            Contract contract = gatewayConfig.getDefaultContract();
 
 
             byte[] resultBytes = contract.evaluateTransaction("queryFoodReportHistory", foodId);

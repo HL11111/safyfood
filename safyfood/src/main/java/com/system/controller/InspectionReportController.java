@@ -3,6 +3,7 @@ package com.system.controller;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.system.config.HyperLedgerFabricGatewayConfig;
 import com.system.pojo.Users;
 import com.system.pojo.Vo.InspectionReportVo;
 import com.system.service.IFoodInspectionReportService;
@@ -57,8 +58,15 @@ public class InspectionReportController {
 
     @Autowired
     private IUsersService usersService;
+
+    //动态选择peer节点
     @Autowired
-    private Contract contract;
+    private HyperLedgerFabricGatewayConfig gatewayConfig;
+
+
+/*  静态peer节点
+    @Autowired
+    private Contract contract;*/
 
 
     // 2 新增数据 提交检测报告 + 存储reportId
@@ -99,6 +107,10 @@ public class InspectionReportController {
             }
             System.out.println("-------------------String.valueOf(report.isPassed()),-----------------------"+String.valueOf(report.isPassed()));
 */
+
+            // 根据city获取对应的Contract
+            Contract contract = gatewayConfig.getContractForCity(city);
+
 
             System.out.println("report.getSafetyStandardsJson()----------------" + report.getSafetyStandardsJson());
             //创建一个新的交易提案，并指定要调用的合约方法名
@@ -181,6 +193,10 @@ public class InspectionReportController {
             }
             System.out.println("-------------------String.valueOf(report.isPassed()),-----------------------"+String.valueOf(report.isPassed()));
 */
+
+            // 根据city获取对应的Contract
+            Contract contract = gatewayConfig.getContractForCity(city);
+
 
             System.out.println("report.getSafetyStandardsJson()----------------" + report.getSafetyStandardsJson());
             //创建一个新的交易提案，并指定要调用的合约方法名
@@ -274,6 +290,9 @@ public class InspectionReportController {
         try {
             log.info("根据key查询数据:{}", governmentId);
 
+            // 使用默认Contract
+            Contract contract = gatewayConfig.getDefaultContract();
+
             // 调用链码方法
             byte[] standardsByte = contract.evaluateTransaction("queryGovernmentStandards", governmentId);
             String standardsJson = StringUtils.newStringUtf8(standardsByte);
@@ -301,6 +320,10 @@ public class InspectionReportController {
             if (!b){
                 throw new RuntimeException("没有该商家D报告信息");
             }
+
+            // 使用默认Contract
+            Contract contract = gatewayConfig.getDefaultContract();
+
             // 调用链码方法
             byte[] reportByte = contract.evaluateTransaction("queryInspectionReports", MerchantIdStr );
 
@@ -331,6 +354,9 @@ public class InspectionReportController {
             if (!b){
                 throw new RuntimeException("没有该数据信息的索引");
             }
+
+            // 使用默认Contract
+            Contract contract = gatewayConfig.getDefaultContract();
 
             // 调用链码方法
             byte[] resultBytes = contract.evaluateTransaction("queryInspectionReportHistory", reportId);
@@ -375,6 +401,10 @@ public class InspectionReportController {
                 return Result.build("商家已认证", REPEAT_SUBMIT);
 
             }
+
+            // 根据city获取对应的Contract
+            Contract contract = gatewayConfig.getContractForCity(city);
+
 
             //创建一个新的交易提案，并指定要调用的合约方法名
             contract.newProposal("approveGreenCertification")

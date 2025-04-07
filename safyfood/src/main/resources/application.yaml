@@ -55,9 +55,11 @@ jwt:
     tokenExpiration: 120 #有效时间,单位分钟
     tokenSignKey: training_system123456  #当前程序签名秘钥 自定义
 
+#access-key-id 和 access-key-secret 是敏感信息 上传到 git 会报错
+#添加了假数据 需要使用时候删掉_Sensitive_Information
 aliyun:
   sms:
-    access-key-id: LTAI5tNkSSJ7QRvpX2RtWDDF
-    access-key-secret: 5OccOCTSSs4RRgBZ8cDLVL9XPAZ4Rj
+    access-key-id: LTAI5tNkSSJ7QRvpX2RtWDDF_Sensitive_Information
+    access-key-secret: 5OccOCTSSs4RRgBZ8cDLVL9XPAZ4Rj_Sensitive_Information
     endpoint: dysmsapi.aliyuncs.com
 
